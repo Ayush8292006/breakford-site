@@ -15,13 +15,13 @@
 <body>
 
 <div id="intro" aria-label="BREAK FORD">
-  <video id="introVideo" muted playsinline preload="auto" aria-hidden="true"></video>
+  <video id="introVideo" muted playsinline preload="metadata" aria-hidden="true"></video>
   <div class="shade"></div>
   <div class="stage">
     <div class="logo-box"><img src="assets/logo-2x.webp" alt="BREAK FORD"></div>
     <div class="tag"><span>BREAK BARRIERS.</span> <span>CROSS BOUNDARIES.</span></div>
   </div>
-  <button class="skip" id="skipIntro">Skip</button>
+  <button class="skip" id="skipIntro" type="button">Skip intro</button>
 </div>
 
 <header class="site" id="hdr">
@@ -51,7 +51,7 @@
   </div>
 </header>
 
-<div id="mnav" aria-hidden="true"><div class="scrim" data-close></div><div class="panel">
+<div id="mnav" aria-hidden="true"><div class="scrim" data-close></div><div class="panel" role="dialog" aria-label="Menu">
   <div class="m-head"><img src="assets/logo-2x.webp" alt="BREAK FORD"><button class="icon-btn" data-close aria-label="Close menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l14 14M19 5 5 19"/></svg></button></div>
   <form id="mSearch" class="m-search"><input id="mq" type="search" placeholder="Search products" aria-label="Search products"></form>
   <div id="mCats"></div>

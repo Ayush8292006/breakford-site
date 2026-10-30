@@ -4,6 +4,8 @@ const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+
+
 /* ================= CATALOGUE =================
    Four categories, in the order the brand presents them.
    To add real photography, give a product an `img` path, e.g. img:'assets/products/obsidian-cue.jpg'.
@@ -639,8 +641,22 @@ buildNav();updBadge();route();
 let introDone=false;
 function endIntro(){
   if(introDone)return;introDone=true;
-  const i=$('#intro');document.documentElement.classList.add('ready');document.body.classList.remove('lock');
-  if(!i)return;i.classList.add('out');setTimeout(()=>{const v=$('video',i);v&&v.pause();i.remove()},1600);
+  const i=$('#intro');
+  document.body.classList.remove('lock');
+  if(!i){document.documentElement.classList.add('ready');return}
+
+  // Step 1: curtains kholo (1.1s + 0.25s delay)
+  i.classList.add('out');
+
+  // Step 2: curtains ~40% khul jaane ke baad hero reveal trigger karo
+  setTimeout(()=>{
+    document.documentElement.classList.add('ready');
+  }, 600);   // ← yahi asli fix hai
+
+  // Step 3: intro DOM hatao
+  setTimeout(()=>{
+    const v=$('video',i); v&&v.pause(); i.remove();
+  }, 1600);
 }
 (function(){
   const i=$('#intro'),home=S.view==='home';
