@@ -1,0 +1,18 @@
+/* Opening break shot — add after style.css */
+#intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block;transition:filter 1.4s ease,opacity .35s ease}
+#intro.brand canvas{filter:blur(3px) brightness(.72) saturate(1.1)}
+#intro.out canvas{opacity:0}
+#intro .shade{background:radial-gradient(ellipse at center,rgba(10,10,10,.55) 0%,rgba(10,10,10,.15) 70%);opacity:0;transition:opacity 1.2s ease}
+#intro.brand .shade{opacity:1}
+#intro .logo-box img{filter:drop-shadow(0 4px 24px rgba(0,0,0,.7))}
+
+/* ---- Transition out: no curtain, the table dissolves into the homepage ---- */
+#intro{transition:background 1s ease .1s}
+#intro::before,#intro::after{display:none}
+#intro.out{background:transparent}
+#intro.out canvas{opacity:0;transform:scale(1.07);transition:opacity 1.1s ease .1s,transform 1.4s cubic-bezier(.3,0,.2,1),filter 1.4s ease}
+#intro.out .shade{opacity:0;transition:opacity .9s ease}
+#intro.out .stage{opacity:1}
+#intro.out .tag{opacity:0;transform:translateY(-6px);transition:opacity .35s ease,transform .5s ease}
+#intro.out .skip{opacity:0}
+#intro .logo-box{overflow:visible}

@@ -623,20 +623,10 @@ const hdr=$('#hdr');
 addEventListener('scroll',()=>hdr.classList.toggle('solid',scrollY>10),{passive:true});
 addEventListener('resize',()=>{const fd=$('.fdone');if(fd)fd.hidden=innerWidth>860});
 
-/* ================= OPENING FILM =================
-   Real footage (Pexels, free licence): a player lines up and breaks the rack in a dark room.
-   The clip starts just before the strike; after the break the logo and tagline rise in,
-   then the black screen splits open onto the homepage. If the video cannot play, the logo opening runs on its own. */
-const INTRO_VIDEO={
-  src:'https://videos.pexels.com/video-files/6254516/6254516-hd_1280_720_25fps.mp4',
-  srcSmall:'https://videos.pexels.com/video-files/6254516/6254516-sd_960_540_25fps.mp4',
-  start:2.4,   // seconds into the clip where the intro begins (player settling into the shot)
-  brand:5.6,   // clip time when the logo rises in (just after the break)
-  end:7.6      // clip time when the screen opens
-};
-/* ================= BOOT + INTRO =================
-   See INTRO_VIDEO above. When the intro ends the black screen opens from the centre
-   (top half up, bottom half down) and the homepage headline rises into place. */
+/* ================= OPENING BREAK SHOT =================
+   Drawn live on a canvas (js/intro.js): a coloured rack, the cue pulls back and strikes,
+   the break plays in slow motion, then the table softens and the BREAK FORD logo rises in.
+   After that the black screen splits open onto the homepage. No external video needed. */
 buildNav();updBadge();route();
 let introDone=false;
 function endIntro(){
@@ -644,37 +634,36 @@ function endIntro(){
   const i=$('#intro');
   document.body.classList.remove('lock');
   if(!i){document.documentElement.classList.add('ready');return}
-
-  // Step 1: curtains kholo (1.1s + 0.25s delay)
+  // One continuous move: the table dissolves into the homepage while the logo flies into the header.
+  const logo=$('.logo-box img',i),hl=$('.brand img');
+  let moved=false;
+  if(logo&&hl){
+    const a=logo.getBoundingClientRect(),b=hl.getBoundingClientRect();
+    if(a.width&&b.width){
+      const sc=b.width/a.width;
+      logo.style.transformOrigin='0 0';
+      logo.style.transition='transform 1.15s cubic-bezier(.65,0,.2,1)';
+      hl.style.visibility='hidden';
+      void logo.offsetWidth;
+      logo.style.transform=`translate(${b.left-a.left}px,${b.top-a.top}px) scale(${sc})`;
+      moved=true;
+    }
+  }
   i.classList.add('out');
-
-  // Step 2: curtains ~40% khul jaane ke baad hero reveal trigger karo
-  setTimeout(()=>{
-    document.documentElement.classList.add('ready');
-  }, 600);   // ← yahi asli fix hai
-
-  // Step 3: intro DOM hatao
-  setTimeout(()=>{
-    const v=$('video',i); v&&v.pause(); i.remove();
-  }, 1600);
+  setTimeout(()=>document.documentElement.classList.add('ready'),moved?500:150);
+  setTimeout(()=>{if(hl)hl.style.visibility='';i.remove()},moved?1250:1000);
 }
 (function(){
   const i=$('#intro'),home=S.view==='home';
   if(RM||!home){i.remove();introDone=true;document.documentElement.classList.add('ready');return}
   document.body.classList.add('lock');
-  const v=$('#introVideo'),V=INTRO_VIDEO;let started=false,branded=false;
-  const brand=()=>{if(branded)return;branded=true;i.classList.add('brand')};
-  // fallback: no video (offline, blocked, slow) -> logo opening on black
-  const plain=()=>{if(started)return;started=true;i.classList.add('play','novideo');setTimeout(brand,300);setTimeout(endIntro,3600)};
-  v.src=innerWidth<900?V.srcSmall:V.src;
-  const go=()=>{if(started)return;started=true;i.classList.add('play');
-    v.play().catch(()=>{});
-    const tick=()=>{if(introDone)return;const t=v.currentTime;if(t>=V.brand)brand();if(t>=V.end){endIntro();return}requestAnimationFrame(tick)};tick();
-    setTimeout(()=>{brand();setTimeout(endIntro,1800)},(V.end-V.start+2.5)*1000); // safety net if playback stalls
-  };
-  v.addEventListener('loadedmetadata',()=>{try{v.currentTime=V.start}catch(e){}},{once:true});
-  v.addEventListener('seeked',go,{once:true});
-  v.addEventListener('error',plain,{once:true});
-  setTimeout(()=>{if(!started)plain()},3500);
+  const brand=()=>i.classList.add('brand');
   $('#skipIntro').onclick=endIntro;
+  try{
+    BFIntro.start(i,{brand,end:endIntro});
+    setTimeout(()=>{brand();endIntro()},11000); // safety net
+  }catch(e){
+    // fallback: logo on black
+    i.classList.add('novideo');setTimeout(brand,300);setTimeout(endIntro,3200);
+  }
 })();
