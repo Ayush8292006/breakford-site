@@ -3,18 +3,12 @@
 const q=(s,r=document)=>r.querySelector(s);
 const view=q('#view'),curtain=q('#curtain');
 
-/* ---- page transitions: two panels close like doors, the destination name appears, page zooms in ---- */
-curtain.innerHTML='<i class="pl"></i><i class="pr"></i><div class="ct"><small>BREAK FORD</small><span class="mask"><b id="cText"></b></span><em></em></div>';
-window.tLabel=r=>r.view==='home'?'Break Barriers':r.view==='product'?P.find(p=>p.id===r.pid).name:r.q?'Search':(r.sub||catOf(r.cat).name);
-window.pageOut=(cb,label)=>{
-  q('#cText').textContent=label||'BREAK FORD';
-  view.classList.add('zout');curtain.classList.remove('open');curtain.classList.add('on');
-  setTimeout(cb,980);
-};
+/* ---- page transition: old page eases out, new page zooms and rises in. No curtain, no text. ---- */
+window.tLabel=()=>'';
+window.pageOut=cb=>{view.classList.add('zout');setTimeout(cb,240)};
 window.pageIn=()=>{
   view.classList.remove('zout');view.classList.add('zin');
-  setTimeout(()=>{curtain.classList.add('open');curtain.classList.remove('on')},120);
-  setTimeout(()=>view.classList.remove('zin'),1300);
+  setTimeout(()=>view.classList.remove('zin'),900);
 };
 
 /* stagger product cards and page blocks as they appear */
