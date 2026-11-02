@@ -1,0 +1,157 @@
+/* BREAK FORD — transitions, live touches, game, coupon box. Loaded after style.css */
+
+/* page transition: doors + destination title + zoom */
+#curtain{position:fixed;inset:0;z-index:95;pointer-events:none;visibility:hidden}
+#curtain.on,#curtain.open{visibility:visible}
+#curtain.on{pointer-events:auto}
+#curtain .pl,#curtain .pr{position:absolute;top:0;bottom:0;width:50.5%;background:var(--black);transition:transform .6s cubic-bezier(.76,0,.24,1)}
+#curtain .pl{left:0;transform:translateX(-101%);border-right:1px solid rgba(203,178,124,.5)}
+#curtain .pr{right:0;transform:translateX(101%);border-left:1px solid rgba(203,178,124,.5)}
+#curtain.on .pl,#curtain.on .pr{transform:none}
+#curtain.open .pl{transform:translateX(-101%);transition-duration:.85s}
+#curtain.open .pr{transform:translateX(101%);transition-duration:.85s}
+#curtain .ct{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;text-align:center;padding:0 24px}
+#curtain small{font-size:11px;letter-spacing:.42em;color:var(--gold);opacity:0;transition:opacity .4s}
+#curtain .mask{display:block;overflow:hidden;padding:4px 0}
+#curtain b{display:block;font-size:clamp(30px,7vw,84px);font-weight:700;font-stretch:112%;line-height:1.05;letter-spacing:-.01em;text-transform:uppercase;transform:translateY(110%);transition:transform .7s cubic-bezier(.2,.8,.2,1);max-width:90vw}
+#curtain em{display:block;width:0;height:2px;background:var(--gold);transition:width .8s cubic-bezier(.7,0,.2,1)}
+#curtain.on small{opacity:1;transition-delay:.45s}
+#curtain.on b{transform:none;transition-delay:.4s}
+#curtain.on em{width:min(220px,40vw);transition-delay:.55s}
+#curtain.open b{transform:translateY(-110%);transition:transform .45s cubic-bezier(.6,0,.8,.4)}
+#curtain.open small{opacity:0;transition:opacity .2s}
+#curtain.open em{width:0;transition:width .3s}
+#view{transition:transform .6s cubic-bezier(.76,0,.24,1),filter .6s}
+#view.zout{transform:scale(.92);filter:blur(4px)}
+@keyframes zoomIn{from{opacity:0;transform:scale(1.14);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+#view.zin{animation:zoomIn 1.1s cubic-bezier(.2,.7,.2,1) both}
+
+/* scroll progress */
+#prog{position:fixed;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;z-index:96;pointer-events:none}
+
+/* entrance motion */
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.12) translate(-1%,-1%)}}
+#grid .card{animation:rise .7s var(--ease) both;animation-delay:calc(var(--i,0)*55ms)}
+.shop-head>*{animation:rise .8s var(--ease) both}
+.shop-head>h1{animation-delay:.08s}.shop-head>p{animation-delay:.16s}.shop-head>.chips{animation-delay:.24s}
+.pdp .gallery{animation:rise .8s var(--ease) both}.pdp .pinfo{animation:rise .8s .12s var(--ease) both}
+.hero-media .photo{animation:kb 24s ease-in-out infinite alternate}
+
+/* live interface */
+.card .pic{transform:perspective(800px) rotateX(var(--rx,0)) rotateY(var(--ry,0));transition:transform .25s ease-out}
+.btn-gold{position:relative;overflow:hidden}
+.btn-gold::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);transform:translateX(-120%);transition:transform .7s var(--ease)}
+.btn-gold:hover::after{transform:translateX(120%)}
+.btn:active{transform:scale(.97)}
+.cat{transition:transform .5s var(--ease),border-color .3s}.cat:hover{transform:translateY(-6px)}
+
+/* own photos: crop the "DM for details" strip along the bottom edge */
+.crop-wm img.own{transform:scale(1.16);transform-origin:50% 0}
+.crop-wm .card:hover .pic img.own{transform:scale(1.2)}
+
+/* floating game button */
+#playFab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:10px;height:44px;padding:0 18px 0 14px;background:var(--black);border:1px solid var(--gold);color:var(--gold);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:rise .8s 1s var(--ease) both}
+#playFab:hover{background:var(--gold);color:var(--black)}
+#playFab svg{animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+html.js:not(.ready) #playFab{display:none}
+
+/* game */
+#game{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:16px;visibility:hidden;opacity:0;transition:opacity .3s,visibility 0s .3s}
+#game.open{visibility:visible;opacity:1;transition-delay:0s}
+#game .scrim{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px)}
+.gpanel{position:relative;width:min(100%,460px);max-height:calc(100dvh - 32px);overflow:auto;background:var(--charcoal);border:1px solid var(--line-2);padding:36px 28px 30px;transform:translateY(24px) scale(.97);transition:transform .5s var(--ease)}
+#game.open .gpanel{transform:none}
+.gx{position:absolute;top:10px;right:10px}
+.gbody h3{font-size:clamp(26px,6vw,34px);line-height:1.1;margin:14px 0 14px}
+.gbody p{color:var(--muted);margin:0 0 26px}
+.gstats{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.gbar{height:3px;background:var(--line);margin-bottom:18px}.gbar i{display:block;height:100%;background:var(--gold);transform-origin:left}
+.gboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gc{aspect-ratio:1;padding:0;background:none;border:0;perspective:600px}
+.gf{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s var(--ease)}
+.gc.on .gf{transform:rotateY(180deg)}
+.gf>span{position:absolute;inset:0;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.gf .front{background:var(--charcoal-3);border:1px solid var(--line-2)}.gf .front img{width:42%;opacity:.55}
+.gf .back{background:#0f3a2d;transform:rotateY(180deg);border:1px solid var(--line)}.gf .back svg{width:76%}
+.gc:hover .front{border-color:var(--gold)}
+.gc.ok .back{border-color:var(--gold);box-shadow:0 0 22px rgba(203,178,124,.35)}
+.ghint{font-size:12.5px;margin:18px 0 0!important;text-align:center}
+.gcode{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--gold);padding:16px 18px;margin-bottom:22px}
+.gcode b{font-size:20px;letter-spacing:.14em;color:var(--gold)}
+.conf{position:absolute;top:-8px;left:var(--x);width:7px;height:12px;background:var(--gold);opacity:0;animation:fall var(--d) ease-in forwards;pointer-events:none}
+.conf:nth-child(3n){background:var(--white)}
+@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(520px) rotate(var(--r))}}
+
+/* coupon / gift card box in the cart */
+.codebox{display:grid;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.codebox .crow{display:flex;gap:8px}
+.codebox input{flex:1;min-width:0;height:40px;padding:0 12px;background:var(--black);border:1px solid var(--line-2);color:var(--white);font:inherit;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.codebox input:focus{outline:0;border-color:var(--gold)}
+.cmsg{margin:0;font-size:12.5px;color:var(--gold);min-height:0}.cmsg:empty{display:none}
+.achip{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(203,178,124,.1);border:1px solid rgba(203,178,124,.35);padding:8px 12px;font-size:12.5px}
+.achip button{background:none;border:0;padding:0;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid currentColor}
+.dfoot .tot.disc{color:var(--gold)}
+
+@media (prefers-reduced-motion:reduce){
+  #curtain,#prog,.conf{display:none}#view.zin{animation:none}
+  #grid .card,.shop-head>*,.pdp .gallery,.pdp .pinfo,.hero-media .photo,#playFab,#playFab svg{animation:none}
+  .card .pic{transform:none}
+}
+@media (max-width:620px){#playFab span{display:none}#playFab{padding:0 14px}.gpanel{padding:34px 18px 24px}}
+
+/* cart / checkout drawer: tidy layout */
+.dfoot{gap:10px}
+.dfoot .codebox .btn{width:auto;flex:none;height:42px;padding:0 20px}
+.codebox{gap:10px;padding-bottom:14px}
+.codebox .crow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch}
+.codebox input{height:42px;width:100%;font-size:12.5px;letter-spacing:.06em}
+.codebox input::placeholder{text-transform:none;letter-spacing:.02em;color:var(--dim)}
+.achip{padding:9px 12px;line-height:1.35}
+.achip span{min-width:0;overflow-wrap:anywhere}
+.achip b{color:var(--gold);letter-spacing:.06em}
+.dfoot .tot{padding:1px 0}
+.dfoot .tot.big{padding-top:10px;margin-top:4px;border-top:1px solid var(--line);font-size:17px}
+.dfoot .tot.big .num{color:var(--gold)}
+.dbody .co{margin-bottom:22px}
+
+
+.dbody .codebox{margin-top:22px;padding:18px 0 4px;border-top:1px solid var(--line);border-bottom:0}
+
+/* ===== HERO background: lit photo, gold glow, drifting dust ===== */
+.hero .wrap{position:relative}
+.hero-media .photo{object-position:60% 35%;filter:brightness(1.12) contrast(1.05) saturate(1.08)}
+.hero-media::after{background:
+  radial-gradient(120% 90% at 100% 0%,rgba(10,10,10,0) 30%,rgba(10,10,10,.55) 100%),
+  linear-gradient(90deg,rgba(10,10,10,.88) 0%,rgba(10,10,10,.55) 45%,rgba(10,10,10,.18) 100%),
+  linear-gradient(0deg,var(--black) 0%,rgba(10,10,10,0) 38%)}
+/* warm spotlight pulsing over the table */
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 55% 50% at 72% 18%,rgba(203,178,124,.30),transparent 70%),radial-gradient(ellipse 60% 35% at 60% 100%,rgba(31,107,60,.30),transparent 70%);
+  animation:glow 7s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.55}to{opacity:1}}
+/* gold dust */
+.hero::before{content:"";position:absolute;inset:-40% 0 0;z-index:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(1.6px 1.6px at 12% 22%,#dcc89c,transparent),radial-gradient(1.2px 1.2px at 38% 64%,#dcc89c,transparent),radial-gradient(1.8px 1.8px at 63% 38%,#f4f3ef,transparent),radial-gradient(1.2px 1.2px at 82% 78%,#dcc89c,transparent),radial-gradient(1.4px 1.4px at 90% 15%,#f4f3ef,transparent),radial-gradient(1px 1px at 25% 88%,#dcc89c,transparent);
+  background-size:380px 380px;animation:dust 38s linear infinite}
+@keyframes dust{to{background-position:0 380px}}
+.hero h1{text-shadow:0 2px 30px rgba(0,0,0,.55)}
+
+/* ===== HERO on phones/tablets: photo shows clearly at the top, text sits on a fade below ===== */
+@media (max-width:860px){
+  .hero{min-height:calc(100svh - var(--hdr));justify-content:flex-end}
+  .hero-media{bottom:auto;height:68svh}
+  .hero-media .photo{object-position:62% 25%}
+  .hero-media::after{background:linear-gradient(0deg,var(--black) 0%,rgba(10,10,10,.82) 22%,rgba(10,10,10,.12) 62%,rgba(10,10,10,.5) 100%)}
+  .hero::after{background:radial-gradient(ellipse 80% 40% at 60% 14%,rgba(203,178,124,.32),transparent 70%),radial-gradient(ellipse 90% 25% at 50% 62%,rgba(31,107,60,.28),transparent 70%)}
+  .hero .wrap{padding-block:30svh 28px}
+  .hero h1{font-size:clamp(30px,9.4vw,44px);margin:18px 0 16px}
+  .hero .lede{font-size:15.5px;margin-bottom:26px;color:#cfcbc2}
+  .hero-foot{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hero-foot div,.hero-foot div+div{padding:16px 10px 18px 0;border-top:0}
+  .hero-foot div+div{padding-left:14px;border-left:1px solid var(--line)}
+  .hero-foot b{font-size:10.5px;letter-spacing:.16em;margin:0}
+  .hero-foot span{display:none}
+}
+@media (prefers-reduced-motion:reduce){.hero::before,.hero::after{animation:none}}

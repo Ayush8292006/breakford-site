@@ -151,10 +151,11 @@ const SUBIMG={
  'Cleaning Equipment':['photo-1611111142691-336dc4530ad0','photo-1763830915835-98ab48194d6f','photo-1580189975076-317533c0b7a6']
 };
 const CATIMG={cues:'photo-1761012321912-f9c7f1f413ba',cases:'photo-1706288456883-9013976d2154',tables:'photo-1761591847985-2184afaab747',accessories:'photo-1661663996100-0c942adf4be2'};
-{const n={};P.forEach(p=>{const l=SUBIMG[p.sub];if(l&&!p.img){const i=(n[p.sub]=(n[p.sub]||0)+1)-1;p.photo=l[i%l.length]}})}
+{const m={};P.forEach(p=>{const o=(typeof OWN_PHOTOS!=='undefined'&&OWN_PHOTOS[p.sub])||[];if(o.length&&!p.img){p.img=o[((m[p.sub]=(m[p.sub]||0)+1)-1)%o.length]}});}
+{const n={};P.forEach(p=>{const l=SUBIMG[p.sub];if(l){const i=(n[p.sub]=(n[p.sub]||0)+1)-1;p.photo=l[i%l.length]}})}
 function media(p,cls='',w=600){
   const ph=`<div class="ph ${cls}" aria-hidden="true">${pictFor(p)}</div>`;
-  if(p.img)return ph+`<img src="${p.img}" alt="${esc(p.name)}" loading="lazy" onerror="this.remove()">`;
+  if(p.img)return ph+`<img class="own" src="${p.img}" alt="${esc(p.name)}" loading="lazy" onerror="${p.photo?`this.onerror=function(){this.remove()};this.classList.remove('own');this.src='${U(p.photo,w)}'`:'this.remove()'}">`;
   if(p.photo)return ph+`<img src="${U(p.photo,w)}" srcset="${U(p.photo,Math.round(w/2))} ${Math.round(w/2)}w, ${U(p.photo,w)} ${w}w, ${U(p.photo,w*2)} ${w*2}w" sizes="(max-width:620px) 50vw, 25vw" alt="${esc(p.name)}" loading="lazy" onerror="this.remove()">`;
   return ph;
 }
@@ -202,7 +203,7 @@ function route(){
   };
   if(same&&v.children.length){if(pendingScroll){const t=pendingScroll;pendingScroll=null;scrollToEl(t)}return}
   if(RM||!v.children.length){apply();return}
-  v.classList.add('swap');setTimeout(apply,220);
+  v.classList.add('swap');pageOut(()=>{apply();pageIn()},tLabel(r));
 }
 /* Update the address without re-rendering. Works on a normal web server, from a local file,
    and inside sandboxed previews (where replaceState can be blocked). */
@@ -590,24 +591,26 @@ function openDrawer(mode='cart'){dMode=mode;closeAll();renderDrawer();$('#drawer
 function closeDrawer(){$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');document.body.classList.remove('lock')}
 $('#cartBtn').onclick=()=>openDrawer('cart');
 $$('#drawer [data-close]').forEach(b=>b.onclick=closeDrawer);
-function totals(){const sub=cart.reduce((s,l)=>s+P.find(p=>p.id===l.id).price*l.qty,0);const ship=sub===0||sub>=2000?0:149;return{sub,ship,tot:sub+ship}}
+function totals(){const sub=cart.reduce((s,l)=>s+P.find(p=>p.id===l.id).price*l.qty,0);const disc=discountOf(sub),net=sub-disc;const ship=sub===0||net>=2000?0:149;const pre=net+ship,gift=giftOf(pre);return{sub,disc,ship,gift,tot:pre-gift}}
 function renderDrawer(){
   const b=$('#dBody'),f=$('#dFoot'),t=totals();
   if(dMode==='done'){$('#dTitle').textContent='Order placed';b.innerHTML=`<div class="done"><div class="label">Confirmed</div><h3>Thank you.</h3><p>Order BF-${Math.floor(Math.random()*90000+10000)} has been placed. A confirmation will follow shortly.</p></div>`;f.innerHTML=`<button class="btn btn-gold" id="contShop">Continue</button>`;$('#contShop').onclick=()=>{closeDrawer();go({view:'home'})};return}
   if(!cart.length){$('#dTitle').textContent='Your cart';b.innerHTML=`<div class="done"><h3>Your cart is empty</h3><p>Explore the range to get started.</p></div>`;f.innerHTML=`<button class="btn btn-gold" data-to="#products" id="dEx">Explore products</button>`;$('#dEx').addEventListener('click',closeDrawer);return}
   const items=cart.map((l,i)=>{const p=P.find(x=>x.id===l.id);return `<div class="line-item"><div class="th">${media(p)}</div><div><h5>${esc(p.name)}</h5><small>${Object.values(l.sel).join(' · ')||esc(p.brand)}</small><div class="mini"><button data-dq="${i}|-1" aria-label="Decrease">−</button><span class="num">${l.qty}</span><button data-dq="${i}|1" aria-label="Increase">+</button><button class="rm" data-rm="${i}">Remove</button></div></div><span class="price">${inr(p.price*l.qty)}</span></div>`}).join('');
-  const sum=`<div class="tot"><span>Subtotal</span><span class="num">${inr(t.sub)}</span></div><div class="tot"><span>Delivery</span><span class="num">${t.ship?inr(t.ship):'Free'}</span></div><div class="tot big"><span>Total</span><span class="num">${inr(t.tot)}</span></div>`;
+  const sum=`<div class="tot"><span>Subtotal</span><span class="num">${inr(t.sub)}</span></div>${t.disc?`<div class="tot disc"><span>Coupon ${esc(applied.coupon)}</span><span class="num">−${inr(t.disc)}</span></div>`:''}<div class="tot"><span>Delivery</span><span class="num">${t.ship?inr(t.ship):'Free'}</span></div>${t.gift?`<div class="tot disc"><span>Gift card</span><span class="num">−${inr(t.gift)}</span></div>`:''}<div class="tot big"><span>Total</span><span class="num">${inr(t.tot)}</span></div>`;
   if(dMode==='checkout'){
     $('#dTitle').textContent='Checkout';
-    b.innerHTML=`<form class="form co" id="coForm"><label>Full name<input id="coName" required autocomplete="name"></label><label>Phone<input id="coPhone" required inputmode="tel" autocomplete="tel"></label><label>Address<input id="coAddr" required autocomplete="street-address"></label><div class="two"><label>City<input id="coCity" required></label><label>PIN code<input id="coPin" required inputmode="numeric" pattern="[0-9]{6}"></label></div><label>Payment<select id="coPay"><option>UPI</option><option>Card</option><option>Net banking</option><option>EMI (tables only)</option></select></label></form>`+items;
+    b.innerHTML=`<form class="form co" id="coForm"><label>Full name<input id="coName" required autocomplete="name"></label><label>Phone<input id="coPhone" required inputmode="tel" autocomplete="tel"></label><label>Address<input id="coAddr" required autocomplete="street-address"></label><div class="two"><label>City<input id="coCity" required></label><label>PIN code<input id="coPin" required inputmode="numeric" pattern="[0-9]{6}"></label></div><label>Payment<select id="coPay"><option>UPI</option><option>Card</option><option>Net banking</option><option>EMI (tables only)</option></select></label></form>`+items+codeBox();
+    {const fv=window.coVals||{};['coName','coPhone','coAddr','coCity','coPin','coPay'].forEach(i=>{const e=$('#'+i);if(fv[i])e.value=fv[i];e.addEventListener('input',()=>{(window.coVals=window.coVals||{})[i]=e.value})})}
     f.innerHTML=sum+`<button class="btn btn-gold" id="place">Place order · ${inr(t.tot)}</button><button class="btn btn-line" id="backCart">Back to cart</button>`;
-    $('#place').onclick=()=>{const fm=$('#coForm');if(!fm.reportValidity())return;cart=[];saveCart();updBadge();dMode='done';renderDrawer()};
+    $('#place').onclick=()=>{const fm=$('#coForm');if(!fm.reportValidity())return;consumeOffers(totals());cart=[];saveCart();updBadge();dMode='done';renderDrawer()};
     $('#coForm').onsubmit=e=>e.preventDefault();
     $('#backCart').onclick=()=>{dMode='cart';renderDrawer()};
   }else{
-    $('#dTitle').textContent=`Your cart (${cart.reduce((s,l)=>s+l.qty,0)})`;b.innerHTML=items;
+    $('#dTitle').textContent=`Your cart (${cart.reduce((s,l)=>s+l.qty,0)})`;b.innerHTML=items+codeBox();
     f.innerHTML=sum+`<button class="btn btn-gold" id="toCo">Checkout ${arrow}</button>`;$('#toCo').onclick=()=>{dMode='checkout';renderDrawer()};
   }
+  bindCode();
   $$('[data-dq]',b).forEach(x=>x.onclick=()=>{const [i,d]=x.dataset.dq.split('|').map(Number);const l=cart[i],p=P.find(q=>q.id===l.id);l.qty=Math.max(1,Math.min(l.qty+d,Math.max(p.stock,1)));saveCart();updBadge();renderDrawer()});
   $$('[data-rm]',b).forEach(x=>x.onclick=()=>{cart.splice(+x.dataset.rm,1);saveCart();updBadge();renderDrawer()});
 }

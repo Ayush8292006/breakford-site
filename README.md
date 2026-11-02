@@ -17,6 +17,12 @@ Open `index.html` in a browser, or serve the folder locally:
 - `assets/logo-2x.webp`: official logo on a transparent background (from `logo-original.png`, proportions unchanged)
 - `assets/favicon.png`: browser tab icon, cropped from the logo's emblem
 
+## New in this version
+- **Page transitions**: gold-edged curtain wipe between pages, staggered card entrance, scroll progress bar, card tilt, slow zoom on the hero photo (all switch off for visitors who prefer reduced motion). Code in `js/extras.js` and `css/extras.css`.
+- **Rack Match game**: floating "Play & win 20% off" button. Match 6 pairs of balls in 40 seconds to win a one-time flat 20% coupon, applied to the cart automatically.
+- **Coupons and gift cards**: code box in the cart. Create your own in `js/offers.js`; step by step in `COUPONS-AND-GIFT-CARDS.md`.
+- **Own product photos**: copy photos into `assets/products/` and list them in `js/photos.js`. The "DM for details" strip is cropped out automatically. Skip the first photo of the client's folder.
+
 ## Brand
 - Tagline: BREAK BARRIERS. CROSS BOUNDARIES.
 - Principles: Precision, Purpose, Progress.
